@@ -3,7 +3,7 @@ MTRandom
 
 A Java implementation of the MT19937 (Mersenne Twister) pseudo random number generator algorithm based upon the original
 C code by Makoto Matsumoto and Takuji Nishimura (see http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html
-for more information).
+for more information). Read the [API documentation](https://hagbard.github.io/mt-random/net/goui/util/MTRandom.html).
 
 This class should provide a dependency free drop-in replacement for `java.util.Random` with the additional
 advantage of having a far longer period, and the ability to use a far larger seed value.
