@@ -10,6 +10,9 @@
  ********************************************************************************/
 package net.goui.util;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -170,11 +173,10 @@ public final class MTRandom extends Random {
   // values are a function of earlier ones. This makes it unnecessary to zero the
   // state vector if setSeed() is called repeatedly.
   private void initStateVector(int seed) {
-    // Annoying runtime check for initialisation of internal data
-    // caused by java.util.Random invoking setSeed() during init.
-    // This is unavoidable because no fields in our instance will
-    // have been initialised at this point, not even if the code
-    // were placed at the declaration of the member variable.
+    // Annoying runtime check for initialisation of internal data caused by java.util.Random
+    // invoking setSeed() during init. This is unavoidable because no fields in our instance will
+    // have been initialised at this point, not even if the code were placed at the declaration of
+    // the member variable.
     if (mt == null) mt = new int[N];
 
     // Unlike the C-code, this version uses a local variable for the loop rather than directly
@@ -369,6 +371,9 @@ public final class MTRandom extends Random {
     return ibuf;
   }
 
+  // Shared value used to attempt to ensure uniqueness of default seeds.
+  private static final AtomicLong defaultSeed = new AtomicLong();
+
   // Internal method to generate a "probably unique" seed array with a "reasonable" number of bits
   // based on the system time and accumulated state.
   //
@@ -380,5 +385,20 @@ public final class MTRandom extends Random {
         System.nanoTime(), (s, t) -> (s ^ t) * 4292484099903637661L);
   }
 
-  private static final AtomicLong defaultSeed = new AtomicLong();
+  // Synchronized to ensure we only snapshot valid state.
+  private synchronized void writeObject(ObjectOutputStream stream) throws IOException {
+    stream.defaultWriteObject();
+  }
+
+  private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+    stream.defaultReadObject();
+    // Since you should not be able to serialize the instance until it's constructed, we expect
+    // internal invariants to be maintained.
+    //
+    // Note that while "mti == mt.length" is possible during nextInt(), that method is synchronized
+    // and snapshots can only be serialized when it's < my.length.
+    if (mt == null || mti < 0 || mti >= mt.length || compatibilityMode == null) {
+      throw new IOException("Invalid internal state for MTRandom");
+    }
+  }
 }
