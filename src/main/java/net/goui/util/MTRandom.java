@@ -226,7 +226,7 @@ public final class MTRandom extends Random {
    * that calling this method is equivalent to calling {@code setSeed(pack(seedBytes))} and in
    * particular will result in a new integer array being generated during the call. If you wish to
    * retain this seed data to allow the pseudo random sequence to be restarted then it would be more
-   * efficient to use the {@link #pack(byte[]))} method to convert it into an integer array first,
+   * efficient to use the {@link #pack(byte[])} method to convert it into an integer array first,
    * and then use that to re-seed the instance.
    *
    * @param seedBytes The non-empty byte array of seed information.
