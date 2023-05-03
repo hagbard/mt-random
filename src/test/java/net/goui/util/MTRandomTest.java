@@ -19,6 +19,8 @@ import static org.junit.Assert.assertThrows;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.UnsignedInteger;
+
+import java.io.*;
 import java.util.Random;
 import java.util.stream.Stream;
 import org.junit.Test;
@@ -100,6 +102,22 @@ public class MTRandomTest {
         .asList()
         .containsExactly(0x04030201, 0x00000605);
     assertThat(MTRandom.pack(new byte[] {})).isEmpty();
+  }
+
+  @Test
+  public void testSerialization() throws IOException, ClassNotFoundException {
+    MTRandom original = new MTRandom(123456789L);
+    // Change the state from the default just to demonstrate we serialized current state.
+    original.nextInt();
+
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    ObjectOutputStream os = new ObjectOutputStream(out);
+    os.writeObject(original);
+    os.flush();
+
+    ObjectInputStream is = new ObjectInputStream(new ByteArrayInputStream(out.toByteArray()));
+    MTRandom serialized = (MTRandom) is.readObject();
+    assertSameSequence(original, serialized);
   }
 
   private static void assertSameSequence(Random a, Random b) {
