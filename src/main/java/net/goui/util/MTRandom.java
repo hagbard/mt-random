@@ -335,7 +335,7 @@ public final class MTRandom extends Random {
   /**
    * Packs a byte array of seed data into a more efficient int array.
    *
-   * <p>This simply utility method can be used in cases where a byte array of seed data is to be
+   * <p>This simple utility method can be used in cases where a byte array of seed data is to be
    * used to repeatedly re-seed the random number sequence. Packing the byte array into an integer
    * array first using this method, and then invoking {@link #setSeed(int[])} with that, removes the
    * need to re-pack the byte array each time {@link #setSeed(byte[])} is called.
